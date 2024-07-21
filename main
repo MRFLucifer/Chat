@@ -1,0 +1,20 @@
+from flask import Flask, render_template
+from flask_socketio import SocketIO, send
+from flask_cors import CORS
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@socketio.on('message')
+def handleMessage(data):
+    print(f"Message from {data['username']}: {data['msg']}")
+    send(data, broadcast=True)
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
